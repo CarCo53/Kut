@@ -10,7 +10,10 @@ def ai_oynat(arayuz):
     
     # Oyun bittiğinde yapılacak tek şey arayüzü güncellemek ve çıkmak.
     if oyun.oyun_bitti_mi(): 
-        arayuz.arayuzu_guncelle()
+        # KRİTİK DÜZELTME: Oyun zaten bitti ve arayüzü güncelleme (puan hesaplama) 
+        # işlemi oyunu sonlandıran hamlenin hemen ardından yapıldı.
+        # Burada tekrar çağırmak, sadece puan hesaplamasını tekrarlar. Bu satır kaldırılmıştır.
+        # arayuz.arayuzu_guncelle() 
         return
 
     if oyun.oyun_durumu == GameState.ATILAN_TAS_DEGERLENDIRME:
