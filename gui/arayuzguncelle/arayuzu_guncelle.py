@@ -6,6 +6,7 @@ from log import logger
 import scoring # YENİ İMPORT
 # YENİ IMPORT: Yerden al fonksiyonunu doğrudan kullanmak için
 from gui.buttons.yerden_al import yerden_al 
+from gui.buttons.gec import gec # YENİ İMPORT: Geç fonksiyonunu kullanmak için
 
 def arayuzu_guncelle(arayuz):
     oyun = arayuz.oyun
@@ -103,13 +104,16 @@ def arayuzu_guncelle(arayuz):
              label.pack(side=tk.LEFT)
              
              if degerlendiren_ben_miyim:
-                 # YERE ATILAN TAŞA TIKLAMA EVENT'İNİN EKLENMESİ
+                 # YERE ATILAN TAŞA TIKLAMA (SOL TIK) EVENT'İNİN EKLENMESİ
                  label.bind("<Button-1>", lambda e: yerden_al(arayuz))
+                 # YERE ATILAN TAŞA PAS GEÇME (SAĞ TIK) EVENT'İNİN EKLENMESİ
+                 label.bind("<Button-3>", lambda e: gec(arayuz))
                  # Taşa tıklanabilir olduğunu belirtmek için çerçeve ekle
                  label.config(highlightthickness=2, highlightbackground="green") 
              else:
                  # Tıklama özelliğini kaldır
                  label.unbind("<Button-1>")
+                 label.unbind("<Button-3>")
                  label.config(highlightthickness=0)
                  
          # Son atılan taş dışında kalanları sadece göster (tıklanabilir değil)

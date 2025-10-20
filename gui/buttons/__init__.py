@@ -20,16 +20,24 @@ class ButtonManager:
         self.butonlar = {}
 
     def ekle_butonlar(self, parent):
+        # Genel Butonlar Çerçevesi (Geç hariç)
         frame = tk.Frame(parent)
         frame.pack(pady=10)
+        
+        # Geç Butonu (Yeni Konum: Deste ve Atılan Taşlar Arasına)
+        self.butonlar["gec"] = tk.Button(self.arayuz.gec_button_frame, text="Geç", command=self.gec)
+        self.butonlar["gec"].pack(side=tk.LEFT, padx=8) # Buraya sadece 'Geç' butonu eklenir
+
+        # Kalan Butonlar (Genel çerçeveye eklenir)
         # self.butonlar["yerden_al"] = tk.Button(frame, text="Yerden Al", command=self.yerden_al) # KALDIRILDI
-        self.butonlar["gec"] = tk.Button(frame, text="Geç", command=self.gec)
         self.butonlar["desteden_cek"] = tk.Button(frame, text="Desteden Çek", command=self.desteden_cek)
         self.butonlar["el_ac"] = tk.Button(frame, text="Elini Aç", command=self.el_ac)
         self.butonlar["tas_at"] = tk.Button(frame, text="Taş At", command=self.tas_at)
         self.butonlar["yeni_oyun"] = tk.Button(frame, text="Yeni Oyun", command=self.yeni_oyun)
         
-        for btn in self.butonlar.values():
+        # Genel çerçevedeki diğer butonları paketle
+        for key in ["desteden_cek", "el_ac", "tas_at", "yeni_oyun"]:
+            btn = self.butonlar[key]
             btn.pack(side=tk.LEFT, padx=8)
 
     

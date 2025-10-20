@@ -53,6 +53,11 @@ def _layout_olustur(arayuz):
     # DESTE VE ATILAN TAŞLAR
     arayuz.deste_frame = tk.LabelFrame(deste_ve_atilan_cerceve, text="Deste", padx=5, pady=5)
     arayuz.deste_frame.pack(side=tk.LEFT, padx=10)
+    
+    # YENİ EKLENTİ: GEÇ BUTONU İÇİN ÇERÇEVE
+    arayuz.gec_button_frame = tk.Frame(deste_ve_atilan_cerceve)
+    arayuz.gec_button_frame.pack(side=tk.LEFT, padx=10)
+
     arayuz.atilan_frame = tk.LabelFrame(deste_ve_atilan_cerceve, text="Atılan Taşlar", padx=5, pady=5)
     arayuz.atilan_frame.pack(side=tk.LEFT, padx=10)
     arayuz.deste_sayisi_label = tk.Label(arayuz.deste_frame, text="", font=("Arial", 12, "bold"))
