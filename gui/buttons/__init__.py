@@ -11,6 +11,7 @@ from gui.buttons.desteden_cek import desteden_cek
 from gui.buttons.el_ac import el_ac
 from gui.buttons.tas_at import tas_at
 from gui.buttons.yeni_oyun import yeni_oyun
+from gui.buttons.butonlari_guncelle import butonlari_guncelle # YENİ IMPORT
 
 class ButtonManager:
     @logger.log_function
@@ -33,30 +34,8 @@ class ButtonManager:
 
     
     def butonlari_guncelle(self, oyun_durumu):
-        for btn in self.butonlar.values():
-            btn.config(state=tk.DISABLED)
-        
-        if oyun_durumu == GameState.BITIS:
-             self.butonlar["yeni_oyun"].config(state=tk.NORMAL)
-             return
-             
-        oyun = self.arayuz.oyun
-        sira_bende = oyun.sira_kimde_index == 0
-        
-        if oyun_durumu == GameState.ILK_TUR and sira_bende:
-            self.butonlar["tas_at"].config(state=tk.NORMAL)
-        elif oyun_durumu == GameState.NORMAL_TUR and sira_bende:
-            self.butonlar["el_ac"].config(state=tk.NORMAL)
-            self.butonlar["desteden_cek"].config(state=tk.NORMAL)
-        elif oyun_durumu == GameState.NORMAL_TAS_ATMA and sira_bende:
-            self.butonlar["tas_at"].config(state=tk.NORMAL)
-            self.butonlar["el_ac"].config(state=tk.NORMAL)
-            
-        elif oyun_durumu == GameState.ATILAN_TAS_DEGERLENDIRME:
-            degerlendiren_ben_miyim = oyun.atilan_tas_degerlendirici and oyun.atilan_tas_degerlendirici.siradaki() == 0
-            if degerlendiren_ben_miyim:
-                # self.butonlar["yerden_al"].config(state=tk.NORMAL) # KALDIRILDI
-                self.butonlar["gec"].config(state=tk.NORMAL)
+        # Modüler fonksiyona devret
+        return butonlari_guncelle(self, oyun_durumu)
 
     # def yerden_al(self): # KALDIRILDI
     #     yerden_al(self.arayuz) # KALDIRILDI
