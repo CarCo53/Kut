@@ -26,11 +26,12 @@ def desteden_cek(game, oyuncu_index):
         
         return True
     else:
-        # Deste boşsa (tas None döndüyse), oyunu bitir.
+        # KRİTİK DÜZELTME: Deste boşsa (tas None döndüyse), oyun sonlanır.
+        # Bu, son taşı çeken oyuncunun hamlesini bitirdikten sonraki oyuncunun sırasıdır.
         if not game.deste.taslar:
             game.oyun_durumu = GameState.BITIS
             game.kazanan_index = None # Deste bittiği için kazanan yok
-            logger.info("Deste bittiği için oyun sonlandırılıyor.")
+            logger.info("Deste boşken sırası gelen oyuncu taş çekemediği için oyun sonlandırılıyor.")
             return False # Çekme işlemi gerçekleşmedi
             
     return False

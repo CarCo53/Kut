@@ -117,10 +117,6 @@ class Game:
                 per.sort(key=lambda t: (t.joker_yerine_gecen or t).deger or 0)
     
     def oyun_bitti_mi(self):
-        # KRİTİK DÜZELTME: Eğer deste boşsa ve durum BITIS değilse, durumu BITIS'e geçir.
-        if not self.deste.taslar and self.oyun_durumu != GameState.BITIS:
-            self.oyun_durumu = GameState.BITIS
-            self.kazanan_index = None
-            logger.info("Oyun durumu, deste boş olduğu için BITIS olarak güncellendi.")
-            
-        return self.oyun_durumu == GameState.BITIS or not self.deste.taslar # <-- Bu satır teknik olarak BITIS kontrolünü yapar.
+        # KRİTİK DÜZELTME: Oyun bitiş kontrolü sadece durum GameState.BITIS olduğunda yapılmalıdır.
+        # Deste boşluğu kontrolü, son taşı atan oyuncunun tas_at fonksiyonuna devredildi.
+        return self.oyun_durumu == GameState.BITIS
