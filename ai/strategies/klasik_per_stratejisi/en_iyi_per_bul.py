@@ -69,13 +69,7 @@ def en_iyi_per_bul(el, gorev):
             aday_perler.append(acilacak_per)
 
 
-    # Geri kalan kombinasyonlar da kontrol edilir (Joker limiti burada da uygulanmalı)
-    for boyut in range(min_sayi, len(el) + 1):
-        for kombo in combinations(el, boyut):
-            kombo_jokerler = [t for t in kombo if t.renk == 'joker']
-            if len(kombo_jokerler) <= joker_limiti: # Tekrar joker limitini uygula
-                 if Rules.per_dogrula(list(kombo), gorev):
-                    aday_perler.append(list(kombo))
+    # Brute-force kombinasyon kontrolü kaldırıldı (Performans optimizasyonu).
     
     
     # Tüm adaylar arasından en yüksek değere sahip olanı seç (Stratejik gereksinim)

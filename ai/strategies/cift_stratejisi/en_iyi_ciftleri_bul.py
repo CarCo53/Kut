@@ -11,8 +11,19 @@ def en_iyi_ciftleri_bul(el, gorev):
     jokerler = [t for t in el if t.renk == 'joker']
     ciftler, tekler = _ciftleri_ve_tekleri_bul(el)
 
-    # Elimizdeki toplam çift sayısını hesapla
-    potansiyel_cift_sayisi = len(ciftler) + len(jokerler) // 2
+    # DÜZELTME: Toplam potansiyel çift sayısını hesaplama mantığı düzeltildi.
+    # Her gerçek çift 1.
+    # Her joker, bir tek taşı tamamlayarak 1 çift oluşturabilir (max: tek sayısı kadar).
+    # Kalan her 2 joker 1 çift oluşturabilir.
+    
+    # 1. Jokerle tamamlanabilecek tek taş sayısını bul
+    can_complete_single = min(len(jokerler), len(tekler))
+    
+    # 2. Tek tamamlamadan artan joker sayısını bul
+    remaining_joker_count = len(jokerler) - can_complete_single
+    
+    # 3. Potansiyel çift sayısını hesapla
+    potansiyel_cift_sayisi = len(ciftler) + can_complete_single + remaining_joker_count // 2
     
     # 4 çifte ulaşabiliyorsa, açılış kombinasyonunu oluştur
     if potansiyel_cift_sayisi >= 4:
@@ -34,6 +45,8 @@ def en_iyi_ciftleri_bul(el, gorev):
             # A. Önce 1 joker + 1 tek taş (1 çift) oluşturma.
             joker_index = 0
             tek_index = 0
+            # while döngüsü doğru şekilde çalışır, çünkü jokerler ve tekler listelerinin boyutları
+            # doğru belirlenmiştir ve cift_sayisi 4'e ulaştığında durur.
             while joker_index < len(jokerler) and tek_index < len(tekler) and cift_sayisi < 4:
                 joker = jokerler[joker_index]
                 tek_tas = tekler[tek_index]
