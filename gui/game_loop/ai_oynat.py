@@ -1,5 +1,3 @@
-# gui/game_loop/ai_oynat.py
-
 from core.game_state import GameState
 from ai.ai_player import AIPlayer
 from log import logger
@@ -47,58 +45,79 @@ def ai_oynat(arayuz):
             elini_acti_mi = oyun.acilmis_oyuncular[sira_index]
 
             # --- İKİNCİL HAMLE DÖNGÜSÜ ---
+            # AI, tur içinde arka arkaya hamle yapma (açma, işleme, joker alma) girişiminde bulunur.
             action_performed_in_loop = True
             while action_performed_in_loop:
                 action_performed_in_loop = False
 
-                # 1. GÖREVİ AÇMA
-                if not elini_acti_mi:
-                    # El açma mantığı buraya entegre edilir (önceki düzeltmedeki gibi)
-                    ac_kombo = ai_oyuncu.ai_el_ac_dene(oyun)
-                    if ac_kombo:
-                        result = oyun.el_ac(sira_index, ac_kombo)
+                ac_kombo = None
+                
+                # 1. EL AÇMA DENEMESİ (GÖREV VEYA YENİ PER)
+                # ai_el_ac_dene, oyuncunun açılıp açılmadığına göre otomatik olarak
+                # göreve (kapalıysa) veya genel perlere (açıksa) bakar.
+                ac_kombo = ai_oyuncu.ai_el_ac_dene(oyun)
+                
+                if ac_kombo:
+                    is_mission_open_attempt = not elini_acti_mi # El açma girişiminin görev açma olup olmadığını tutar
+                    
+                    result = oyun.el_ac(sira_index, ac_kombo)
 
-                        # JOKER SEÇİMİ OTOMATİKLEŞTİRME DÜZELTMESİ (Burada korundu)
-                        if result and result.get('status') == 'joker_choice_needed':
-                            secilen_taslar = result["secilen_taslar"]
-                            joker = result["joker"]
-                            secilen_deger = None
+                    # JOKER SEÇİMİ OTOMATİKLEŞTİRME DÜZELTMESİ (Burada korundu)
+                    if result and result.get('status') == 'joker_choice_needed':
+                        secilen_taslar = result["secilen_taslar"]
+                        joker = result["joker"]
+                        secilen_deger = None
+                        
+                        for option in result["options"]:
+                            joker.joker_yerine_gecen = option 
                             
-                            for option in result["options"]:
-                                joker.joker_yerine_gecen = option 
+                            # Görev açılışı mı yoksa genel per açılışı mı?
+                            if is_mission_open_attempt:
                                 if Rules.per_dogrula(secilen_taslar, oyun.mevcut_gorev):
                                     secilen_deger = option
                                     break
-                                joker.joker_yerine_gecen = None
-                            
-                            if secilen_deger:
-                                logger.info(f"AI Otomatik Joker Seçimi: El açmak için jokerin yerine {secilen_deger.renk}_{secilen_deger.deger} seçildi.")
-                                joker.joker_yerine_gecen = secilen_deger 
-                                oyun.el_ac_joker_ile(sira_index, secilen_taslar, joker, secilen_deger)
-                                result = None
                             else:
-                                logger.error("AI Otomatik Joker Seçimi Başarısız: Geçerli joker seçeneği bulunamadı.")
-                                result['status'] = 'fail'
+                                # Eli açık oyuncu için genel per doğrulaması
+                                if Rules.genel_per_dogrula(secilen_taslar):
+                                    secilen_deger = option
+                                    break
+                                
+                            joker.joker_yerine_gecen = None
                         
-                        if result is None or (result and result.get('status') != 'fail'):
-                            if oyun.oyun_bitti_mi(): 
-                                arayuz.arayuzu_guncelle()
-                                return
+                        if secilen_deger:
+                            logger.info(f"AI Otomatik Joker Seçimi: Per açmak için jokerin yerine {secilen_deger.renk}_{secilen_deger.deger} seçildi.")
+                            joker.joker_yerine_gecen = secilen_deger 
+                            oyun.el_ac_joker_ile(sira_index, secilen_taslar, joker, secilen_deger)
+                            result = None
+                        else:
+                            logger.error("AI Otomatik Joker Seçimi Başarısız: Geçerli joker seçeneği bulunamadı.")
+                            result['status'] = 'fail'
+                    
+                    if result is None or (result and result.get('status') != 'fail'):
+                        if is_mission_open_attempt: 
+                            elini_acti_mi = True # Görev açıldıysa, elini_acti_mi'yi güncelle
+                            
+                        if oyun.oyun_bitti_mi(): 
                             arayuz.arayuzu_guncelle()
-                            elini_acti_mi = True
-                            action_performed_in_loop = True
-                            continue 
+                            return
+                        arayuz.arayuzu_guncelle()
+                        action_performed_in_loop = True
+                        continue 
                        
-                # 2. İŞLEME / JOKER DEĞİŞTİRME 
-                # (Kural: İlk el açma hamlesinin yapıldığı turda işleme yapılamaz. Ancak burada AI olduğu için, 
-                # sadece el açma durumu ile aynı turda olmadığını kontrol etmek yeterlidir)
-                if elini_acti_mi and oyun.ilk_el_acan_tur.get(sira_index, -1) < oyun.tur_numarasi:
+                # 2. İŞLEME / JOKER DEĞİŞTİRME (Sadece el açıkken)
+                # (Kural: İlk el açma hamlesinin yapıldığı turda işleme/joker değiştirme yapılamaz. 
+                # Bu kısıtlama, ActionManager içinde kontrol edilir.)
+                if elini_acti_mi:
                     islem_hamlesi = ai_oyuncu.ai_islem_yap_dene(oyun)
                     if islem_hamlesi:
                         if islem_hamlesi.get("action_type") == "joker_degistir":
                             oyun.joker_degistir(sira_index, islem_hamlesi['sahip_idx'], islem_hamlesi['per_idx'], islem_hamlesi['tas_id'])
                         elif islem_hamlesi.get("action_type") == "islem_yap":
-                            oyun.islem_yap(sira_index, islem_hamlesi['sahip_idx'], islem_hamlesi['per_idx'], islem_hamlesi['tas_id'])
+                            # islem_yap fonksiyonu True/False döndürür
+                            result = oyun.islem_yap(sira_index, islem_hamlesi['sahip_idx'], islem_hamlesi['per_idx'], islem_hamlesi['tas_id'])
+                            if not result:
+                                # İşlem başarısız olursa döngüye devam etme
+                                continue 
                         
                         if oyun.oyun_bitti_mi(): 
                             arayuz.arayuzu_guncelle()
@@ -107,16 +126,9 @@ def ai_oynat(arayuz):
                         action_performed_in_loop = True
                         continue 
 
-                # 3. YENİ EL AÇMA (Eli açık oyuncu için)
-                # ... (Kod tekrarları kaldırıldı, yukarıdaki mantık yeterli) ...
-                
-                # Sadece 2. hamle olarak açma denemesini kaldırdım, çünkü 
-                # 1. GÖREVİ AÇMA zaten ilk açılışı kapsıyor, 
-                # ve 2. İŞLEME/JOKER DEĞİŞTİRME sonrasında döngü tekrar başlar.
-
             # --- DÖNGÜ SONU ---
             
-            # 4. TAŞ ATMA 
+            # 3. TAŞ ATMA 
             if ai_oyuncu.el and oyun.oyun_durumu == GameState.NORMAL_TAS_ATMA:
                 tas_to_discard = ai_oyuncu.karar_ver_ve_at(oyun)
                 if tas_to_discard:
