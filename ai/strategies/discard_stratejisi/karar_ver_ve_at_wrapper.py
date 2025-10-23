@@ -8,6 +8,7 @@ def karar_ver_ve_at_wrapper(ai_player, game):
     if not ai_player.el: return None
     oyun_analizi = eli_analiz_et(ai_player.el)
     
-    # NOTE: en_akilli_ati_bul fonksiyonu, el, oyun_analizi ve atilan_taslar (veya None) bekler.
-    atilan_tas = en_akilli_ati_bul(ai_player.el, oyun_analizi, game.atilan_taslar)
+    # Tüm karar verme mantığı dışarıdaki fonksiyona devredildi, artık 'game' nesnesini geçiriyoruz.
+    # en_akilli_ati_bul artık 'game' nesnesini kabul edecek şekilde güncellenmiştir.
+    atilan_tas = en_akilli_ati_bul(ai_player.el, oyun_analizi, game)
     return atilan_tas
